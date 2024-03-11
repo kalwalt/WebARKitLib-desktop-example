@@ -12,7 +12,7 @@ include(FetchContent)
 
 FetchContent_Declare(
   build_opencv
- URL https://github.com/webarkit/opencv-em/releases/download/0.1.4/opencv-4.7.0.zip
+ URL https://github.com/webarkit/opencv-em/releases/download/0.1.5/opencv-4.7.0.zip
 )
 
 FetchContent_MakeAvailable(build_opencv)
@@ -37,6 +37,7 @@ target_include_directories(webarkit_example PRIVATE
         "${build_opencv_SOURCE_DIR}/libs/opencv/modules/imgcodecs/include"
         "${build_opencv_SOURCE_DIR}/libs/opencv/modules/imgproc/include"
         "${build_opencv_SOURCE_DIR}/libs/opencv/modules/video/include"
+        "${build_opencv_SOURCE_DIR}/libs/opencv/modules/videoio/include"
         "${build_opencv_SOURCE_DIR}/libs/opencv_contrib/modules/xfeatures2d/include"
         )
 
@@ -52,6 +53,7 @@ target_link_libraries(
   "${build_opencv_SOURCE_DIR}/lib/libopencv_flann.a"
   "${build_opencv_SOURCE_DIR}/lib/libopencv_imgcodecs.a"
   "${build_opencv_SOURCE_DIR}/lib/libopencv_video.a"
+  "${build_opencv_SOURCE_DIR}/lib/libopencv_videoio.a"
   "${build_opencv_SOURCE_DIR}/lib/libopencv_xfeatures2d.a"
   "${build_opencv_SOURCE_DIR}/lib/libopencv_imgproc.a"
   "${build_opencv_SOURCE_DIR}/lib/libopencv_core.a"
