@@ -2,12 +2,6 @@ cmake_minimum_required(VERSION 3.22)
 
 project(WebarkitLib_desktop_example)
 
-if(POLICY CMP0135)
-  cmake_policy(SET CMP0026 NEW)
-endif()
-
-set(CMAKE_CXX_STANDARD 14)
-
 include(FetchContent)
 
 FetchContent_Declare(
@@ -17,14 +11,20 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(build_opencv)
 
-add_subdirectory(./src/WebARKitLib/WebARKit ./src/WebARKitLib/WebARKit/build)
+add_subdirectory(src/igl)
+add_subdirectory(src/WebARKitLib/WebARKit src/WebARKitLib/WebARKit/build)
 
-add_executable(webarkit_example main.cpp)
+add_executable(webarkit_example webarkit_example.cpp)
+igl_set_cxxstd(webarkit_example 20)
+igl_set_folder(webarkit_example WebarkitLib_desktop_example)
 
-get_filename_component(PARENT_DIR ./src/WebARKitLib ABSOLUTE)
+get_filename_component(SRC_DIR ./src ABSOLUTE)
+get_filename_component(WEBARKITLIB_DIR ${SRC_DIR}/WebARKitLib ABSOLUTE)
 
-target_include_directories(webarkit_example PRIVATE "${PARENT_DIR}/WebARKit/include")
-target_include_directories(webarkit_example PRIVATE "${PARENT_DIR}/WebARKit/WebARKitTrackers/WebARKitOpticalTracking/include")
+
+target_include_directories(webarkit_example PRIVATE "${SRC_DIR}/igl/src")
+target_include_directories(webarkit_example PRIVATE "${WEBARKITLIB_DIR}/WebARKit/include")
+target_include_directories(webarkit_example PRIVATE "${WEBARKITLIB_DIR}/WebARKit/WebARKitTrackers/WebARKitOpticalTracking/include")
 
 target_include_directories(webarkit_example PRIVATE
         "${build_opencv_SOURCE_DIR}"
@@ -42,12 +42,19 @@ target_include_directories(webarkit_example PRIVATE
         )
 
 set(webarkit_example 
-${PARENT_DIR}/WebARKit/WebARKitManager.cpp
+${WEBARKITLIB_DIR}/WebARKit/WebARKitManager.cpp
 )
 
 target_link_libraries(
   webarkit_example
   WebARKitLib
+  IGLLibrary
+  IGLOpenGL
+  glfw
+  ktx
+  IGLUimgui
+  IGLUsimple_renderer
+  IGLUtexture_loader
   "${build_opencv_SOURCE_DIR}/lib/libopencv_calib3d.a"
   "${build_opencv_SOURCE_DIR}/lib/libopencv_features2d.a"
   "${build_opencv_SOURCE_DIR}/lib/libopencv_flann.a"

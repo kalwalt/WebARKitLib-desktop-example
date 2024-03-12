@@ -1,3 +1,6 @@
 [submodule "src/WebARKitLib"]
 	path = src/WebARKitLib
 	url = https://github.com/webarkit/WebARKitLib.git
+[submodule "src/igl"]
+	path = src/igl
+	url = https://github.com/facebook/igl
