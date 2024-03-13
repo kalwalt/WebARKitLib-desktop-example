@@ -138,7 +138,7 @@ std::shared_ptr<IRenderPipelineState> renderPipelineState_Quad_;
 static void processVideo(webarkit::WebARKitManager &manager,
                   cv::VideoCapture &capture) {
   // Grab first frame to get the frame dimensions
-  cv::Mat currentFrame;
+  cv::Mat currentFrame, refGray;
 
   capture.open(0); // Open the default camera
 
@@ -151,6 +151,7 @@ static void processVideo(webarkit::WebARKitManager &manager,
   }
 
   bool shouldQuit = false;
+ 
   do {
     capture >> currentFrame;
 
@@ -161,8 +162,12 @@ static void processVideo(webarkit::WebARKitManager &manager,
       continue;
     }
 
-    manager.processFrameData(currentFrame.data, currentFrame.cols,
-                             currentFrame.rows, webarkit::ColorSpace::RGBA);
+    cv::Mat bgrFrame(frameSize, CV_8UC3, currentFrame.data);
+    refGray.create(frameSize.height, frameSize.width, CV_8UC1);
+    cv::cvtColor(bgrFrame, refGray, cv::COLOR_BGR2GRAY);
+
+    manager.processFrameData(refGray.data, currentFrame.cols,
+                             currentFrame.rows, webarkit::ColorSpace::GRAY);
     shouldQuit = _shouldQuit;
   } while (!shouldQuit);
 }
@@ -421,12 +426,6 @@ int main(int argc, char* argv[]) {
   createFramebuffer(getNativeDrawable());
   createRenderPipeline();
 
-  // Main loop
-  while (!glfwWindowShouldClose(window_)) {
-    render(getNativeDrawable());
-    glfwPollEvents();
-  }
-
   webarkit::WebARKitManager manager;
   // Init the manager with the Teblid tracker
   manager.initialiseBase(webarkit::TRACKER_TYPE::TEBLID_TRACKER, 640, 480);
@@ -447,8 +446,14 @@ int main(int argc, char* argv[]) {
 
   manager.initTracker(data, width, height, webarkit::ColorSpace::GRAY);
 
-  cv::VideoCapture cap;
-  processVideo(manager, cap);
+   cv::VideoCapture cap;
+
+  // Main loop
+  while (!glfwWindowShouldClose(window_)) {
+    render(getNativeDrawable());
+    processVideo(manager, cap);
+    glfwPollEvents();
+  }
 
   // destroy all the Vulkan stuff before closing the window
   renderPipelineState_Quad_ = nullptr;
